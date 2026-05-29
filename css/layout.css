@@ -1,0 +1,112 @@
+/* Macro Grid Architecture */
+
+/* Global container */
+.app-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto 1fr auto;
+  grid-template-areas:
+    "app-header"
+    "app-sidebar"
+    "app-main"
+    "app-footer";
+  min-height: 100vh;
+  position: relative;
+  background-color: var(--color-moonlit-grey-light);
+  overflow-x: hidden;
+}
+
+/* Landmarking items to Grid Areas */
+.header-area {
+  grid-area: app-header;
+  position: sticky;
+  top: 0;
+  background-color: rgba(242, 240, 234, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 100;
+}
+
+.sidebar-area {
+  grid-area: app-sidebar;
+  position: sticky;
+  top: 70px; /* Offset for header */
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+  align-self: start;
+  background-color: rgba(242, 240, 234, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 90;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.sidebar-area::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+.main-area {
+  grid-area: app-main;
+}
+
+.footer-area {
+  grid-area: app-footer;
+}
+
+/* Tablet Breakpoint (768px) */
+@media (min-width: 768px) {
+  .app-container {
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "app-header app-header"
+      "app-sidebar app-main"
+      "app-footer app-footer";
+  }
+}
+
+/* Desktop Breakpoint (1024px) */
+@media (min-width: 1024px) {
+  .app-container {
+    grid-template-columns: 300px 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "app-header app-header"
+      "app-sidebar app-main"
+      "app-footer app-footer";
+    max-width: 1600px;
+    margin: 0 auto;
+    border-left: 1px solid var(--color-glass-border);
+    border-right: 1px solid var(--color-glass-border);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+/* Main Content Macro Grid */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  padding: var(--space-md);
+}
+
+@media (min-width: 640px) {
+  .main-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .main-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Utility section grid layout for fine-grained sections */
+.section-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  align-items: start;
+}
