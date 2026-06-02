@@ -8,76 +8,7 @@ const APP_STATE = {
   activeCategory: 'all',
   likedItemsCount: 0,
   likedItemsSet: new Set(),
-  items: [
-    {
-      id: 1,
-      title: 'Architecting for 2025: Grounded Aesthetics',
-      category: 'design',
-      badge: 'Trending',
-      description: 'Explore the shifting landscape of digital design, moving away from hyper-minimalist white spaces towards grounded, rich earthly hues like mocha mousse coupled with fluid layouts.',
-      authorName: 'A. Architect',
-      authorInitials: 'AA',
-      image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600&h=400&fit=crop',
-      altText: 'Modern minimalist architecture featuring warm earthly tones and fluid structures.'
-    },
-    {
-      id: 2,
-      title: 'Framework-less Craftsmanship with Vanilla JS',
-      category: 'development',
-      badge: 'New',
-      description: 'How to build highly scalable, ultra-fast, and deeply responsive digital products utilizing only native browser mechanisms, grid foundations, and semantic strategies.',
-      authorName: 'C. Developer',
-      authorInitials: 'CD',
-      image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=400&fit=crop',
-      altText: 'A high-end workspace setup with code visible on a sleek monitor.'
-    },
-    {
-      id: 3,
-      title: 'Productive Strategy for Modern Interfaces',
-      category: 'strategy',
-      badge: 'Guide',
-      description: 'A deep-dive analysis of macro layouts versus micro layouts and how to optimize user interaction structures using screen-reader compliance blueprints and solid WCAG principles.',
-      authorName: 'E. Planner',
-      authorInitials: 'EP',
-      image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop',
-      altText: 'Strategic planning and abstract diagrams laid out on a professional desk.'
-    },
-    {
-      id: 4,
-      title: 'Responsive Fluid Scales and Clamp Calculations',
-      category: 'design',
-      badge: 'Hot',
-      description: 'Master the math behind fluid typography and dynamic spacing. Ensure flawless alignment, crisp scaling, and natural visual hierarchy without breaking layouts across mobile and widescreen monitors.',
-      authorName: 'M. Designer',
-      authorInitials: 'MD',
-      // I swapped the broken URL for a stable, highly abstract architectural image
-      // A softer, more realistic architectural image to match the grounded aesthetic
-      image: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=400&fit=crop',
-      altText: 'Abstract architectural fluid curves demonstrating scaling concepts.'
-    },
-    {
-      id: 5,
-      title: 'Designing Accessible Tables & Landmark Trees',
-      category: 'strategy',
-      badge: 'WCAG',
-      description: 'Understanding how assistive tech processes structural blocks. Elevate screen reader experiences through strict landmark distributions, clear descriptive labeling, and perfect keyboard hooks.',
-      authorName: 'S. Engineer',
-      authorInitials: 'SE',
-      image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&h=400&fit=crop',
-      altText: 'A person thoughtfully interacting with a clean, highly accessible workspace environment.'
-    },
-    {
-      id: 6,
-      title: 'Micro-Animations that Delight Users',
-      category: 'development',
-      badge: 'Interactive',
-      description: 'A catalog of performance-friendly CSS transitions and micro-interactions. Create elements that feel tactile, responsive, and natural without loading massive script libraries.',
-      authorName: 'T. Coder',
-      authorInitials: 'TC',
-      image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&h=400&fit=crop',
-      altText: 'Abstract colorful rendering of digital micro-interactions and smooth gradients.'
-    }
-  ]
+  items: []
 };
 
 // --- DOM References ---
@@ -97,14 +28,59 @@ const DOM = {
   navLinks: document.querySelectorAll('.nav-link')
 };
 
+// --- Fetch API ---
+async function fetchLiveArticles() {
+  try {
+    const response = await fetch('http://localhost:3000/articles');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const parsedData = await response.json();
+    console.log("Backend Response:", parsedData);
+
+    // Safely assign the array and normalize the data keys
+    if (parsedData && parsedData.data && Array.isArray(parsedData.data.articles)) {
+      APP_STATE.items = parsedData.data.articles.map((article, index) => ({
+        id: article.id || index + 1,
+        title: article.title || 'Untitled Article',
+        category: article.category || 'development',
+        badge: article.badge || 'Live',
+        // Fallback checks for mismatched backend keys
+        description: article.description || article.body || 'No description provided.',
+        authorName: article.author || article.authorName || 'Decode Developer',
+        authorInitials: (article.author || article.authorName || 'DD').substring(0, 2).toUpperCase(),
+        // Provide a default pristine image if the backend didn't send one
+        image: article.image || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=400&fit=crop',
+        altText: article.altText || 'Article thumbnail'
+      }));
+    } else {
+      APP_STATE.items = [];
+    }
+
+  } catch (error) {
+    console.error('Failed to fetch live articles:', error);
+    if (DOM.cardGrid) {
+      DOM.cardGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: var(--space-xl) var(--space-md); color: var(--color-slate-grey);">Unable to establish connection to the server.</div>';
+    }
+  }
+
+  // The Fallback Safety
+  if (!Array.isArray(APP_STATE.items)) {
+    APP_STATE.items = [];
+  }
+}
+
 // --- Initializer ---
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initMobileMenu();
-  initFilters();
   initSidebar();
   initNav();
-  renderInitialCards();
   initModal();
+
+  await fetchLiveArticles();
+
+  initFilters();
+  renderInitialCards();
 });
 
 // --- Mobile Sidebar Toggle Menu ---
