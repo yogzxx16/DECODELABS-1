@@ -31,7 +31,7 @@ const DOM = {
 // --- Fetch API ---
 async function fetchLiveArticles() {
   try {
-    const response = await fetch('http://localhost:3000/articles');
+    const response = await fetch('https://aesthete-api-yogzxx16.onrender.com/articles');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
