@@ -302,7 +302,7 @@ function bindCardInteractions() {
   const cards = DOM.cardGrid.querySelectorAll('.content-card');
 
   cards.forEach(card => {
-    const cardId = parseInt(card.getAttribute('data-id'));
+    const cardId = card.getAttribute('data-id');
     const likeBtn = card.querySelector('.card-like-btn');
     const readBtn = card.querySelector('.card-read-btn');
 
@@ -379,7 +379,7 @@ function initModal() {
 }
 
 function openDetailsModal(cardId) {
-  const item = APP_STATE.items.find(i => i.id === cardId);
+  const item = APP_STATE.items.find(i => String(i.id) === String(cardId));
   if (!item) return;
 
   // Store the element that triggered the modal for focus restoration
